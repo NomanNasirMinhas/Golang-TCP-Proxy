@@ -33,11 +33,27 @@ func startClient(addr string, useTLS bool, certFile string) {
 		return
 	}
 
-	// Send some data to the server
-	_, err = conn.Write([]byte("Hello, server!"))
-	if err != nil {
-		fmt.Println(err)
-		return
+	// Go into an infinite loop reading from stdin and sending to the server
+	for {
+		// Read from stdin
+		buf := make([]byte, 1024)
+		n, err := os.Stdin.Read(buf)
+		if err != nil {
+			fmt.Println(err)
+			return
+		}
+
+		//If the user types "quit", then stop
+		if string(buf[:n-1]) == "quit" {
+			break
+		}
+		// Send to the server
+		_, err = conn.Write(buf[:n])
+		if err != nil {
+			fmt.Println(err)
+			return
+		}
+
 	}
 
 	// Close the connection
