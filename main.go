@@ -12,7 +12,7 @@ func main() {
 	var useTLS bool
 	var certFile string
 	var keyFile string
-	flag.StringVar(&addr, "addr", "localhost:8080", "Address of the server")
+	flag.StringVar(&addr, "addr", "0.0.0.0:8080", "Address of the server")
 	flag.BoolVar(&isServer, "server", false, "Start in server mode")
 	flag.BoolVar(&isClient, "client", false, "Start in client mode")
 	flag.BoolVar(&useTLS, "tls", false, "Use TLS")
