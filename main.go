@@ -9,9 +9,15 @@ func main() {
 	var addr string
 	var isServer bool
 	var isClient bool
+	var useTLS bool
+	var certFile string
+	var keyFile string
 	flag.StringVar(&addr, "addr", "localhost:8080", "Address of the server")
 	flag.BoolVar(&isServer, "server", false, "Start in server mode")
 	flag.BoolVar(&isClient, "client", false, "Start in client mode")
+	flag.BoolVar(&useTLS, "tls", false, "Use TLS")
+	flag.StringVar(&certFile, "cert", "cert.pem", "Certificate file")
+	flag.StringVar(&keyFile, "key", "key.pem", "Key file")
 	flag.Parse()
 	// show help if no arguments are passed
 	if flag.NFlag() == 0 {
@@ -23,8 +29,8 @@ func main() {
 	}
 
 	if isServer {
-		startServer(addr)
+		startServer(addr, useTLS, certFile, keyFile)
 	} else {
-		startClient(addr)
+		startClient(addr, useTLS, certFile)
 	}
 }

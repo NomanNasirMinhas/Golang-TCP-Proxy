@@ -1,13 +1,26 @@
 package main
 
 import (
+	"crypto/tls"
 	"fmt"
+	"log"
 	"net"
 )
 
-func startServer(addr string) {
-	// Listen for incoming connections on port 8080
-	ln, err := net.Listen("tcp", addr)
+func startServer(addr string, useTLS bool, certFile string, keyFile string) {
+	var ln net.Listener
+	var err error
+	if useTLS {
+		cert, err := tls.LoadX509KeyPair(certFile, keyFile)
+		if err != nil {
+			log.Fatal(err)
+		}
+		config := &tls.Config{Certificates: []tls.Certificate{cert}}
+		log.Printf("listening on port %s\n", addr)
+		ln, err = tls.Listen("tcp", addr, config)
+	} else {
+		ln, err = net.Listen("tcp", addr)
+	}
 	if err != nil {
 		fmt.Println(err)
 		return
