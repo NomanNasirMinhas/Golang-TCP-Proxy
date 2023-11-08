@@ -3,13 +3,16 @@ package main
 import (
 	"crypto/tls"
 	"fmt"
+	"io"
 	"log"
 	"net"
+	"net/http"
 	"os"
 	"strings"
 )
 
 func startServer(addr string, TLS_Type int8, certFile string, keyFile string, generateCert bool) {
+
 	var ln net.Listener
 	var err error
 	if TLS_Type == 1 {
@@ -85,11 +88,11 @@ func startServer(addr string, TLS_Type int8, certFile string, keyFile string, ge
 func handleConnection(conn net.Conn) {
 	// Close the connection when we're done
 	defer conn.Close()
-
+	api_url := "https://randomuser.me/api/?seed="
 	// Go into an infinite loop reading from the connection
 	for {
 		// Read from the connection
-		buf := make([]byte, 1024)
+		buf := make([]byte, 1024*10)
 		n, err := conn.Read(buf)
 		if err != nil {
 			fmt.Println(err)
@@ -99,8 +102,29 @@ func handleConnection(conn net.Conn) {
 		if string(buf[:n-1]) == "quit" {
 			break
 		}
+		query := api_url + string(buf[:n-1])
+		fmt.Printf("Performing a random query for %s\n", query)
+		// get request on the api
+		resp, err := http.Get(strings.Split(query, "\r")[0])
+		if err != nil {
+			fmt.Println(err)
+			return
+		}
+		defer resp.Body.Close()
+		// read the response body
+		body, err := io.ReadAll(resp.Body)
+		if err != nil {
+			fmt.Println(err)
+			return
+		}
+		// write the response body to the connection
+		_, err = conn.Write(body)
+		if err != nil {
+			fmt.Println(err)
+			return
+		}
+		fmt.Printf("Sent to %s: \n", conn.RemoteAddr())
 
-		fmt.Printf("Received from %s: %s\n", conn.RemoteAddr(), buf)
 	}
 
 	// Print the incoming data

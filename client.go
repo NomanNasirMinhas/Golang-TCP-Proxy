@@ -32,11 +32,25 @@ func startClient(addr string, useTLS bool, certFile string) {
 		fmt.Println(err)
 		return
 	}
+	// Start an infinite goroutine to read from the server and print to stdout
+	go func() {
+		for {
+			// Read from the server
+			buf := make([]byte, 1024*10)
+			n, err := conn.Read(buf)
+			if err != nil {
+				fmt.Println(err)
+				return
+			}
+			// Print to stdout
+			fmt.Print("Server Sent: " + string(buf[:n]) + "\n")
+		}
+	}()
 
 	// Go into an infinite loop reading from stdin and sending to the server
 	for {
 		// Read from stdin
-		buf := make([]byte, 1024)
+		buf := make([]byte, 1024*10)
 		n, err := os.Stdin.Read(buf)
 		if err != nil {
 			fmt.Println(err)
