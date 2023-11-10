@@ -16,6 +16,7 @@ import (
 func startServer(addr string, TLS_Type int8, certFile string, keyFile string, generateCert bool) {
 	d := oqs.LiboqsVersion()
 	fmt.Printf("Lib-OQS version: %s\n", d)
+
 	var ln net.Listener
 	var err error
 	if TLS_Type == 1 {
@@ -107,8 +108,15 @@ func handleConnection(conn net.Conn) {
 		}
 		query := api_url + string(buf[:n-1])
 		fmt.Printf("Performing a random query for %s\n", query)
+		//Define a transport to object to set the oqs ciphersuite
+		client := &http.Client{
+			Transport: &http.Transport{
+				TLSClientConfig: &tls.Config{
+					//CipherSuites: []uint16{oqs.TLS_AES_128_OQS_KEM_FRODOKEM_640_AES_128_SHA256},
+				},
+			}}
 		// get request on the api
-		resp, err := http.Get(strings.Split(query, "\r")[0])
+		resp, err := client.Get(strings.Split(query, "\r")[0])
 		if err != nil {
 			fmt.Println(err)
 			return
