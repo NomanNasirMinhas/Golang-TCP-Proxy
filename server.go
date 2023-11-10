@@ -9,10 +9,13 @@ import (
 	"net/http"
 	"os"
 	"strings"
+
+	"github.com/open-quantum-safe/liboqs-go/oqs"
 )
 
 func startServer(addr string, TLS_Type int8, certFile string, keyFile string, generateCert bool) {
-
+	d := oqs.LiboqsVersion()
+	fmt.Printf("Lib-OQS version: %s\n", d)
 	var ln net.Listener
 	var err error
 	if TLS_Type == 1 {
