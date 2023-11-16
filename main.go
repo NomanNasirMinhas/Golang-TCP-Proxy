@@ -11,17 +11,13 @@ func main() {
 	var isClient bool
 	var useTLS bool
 	var usePQC bool
-	var certFile string
-	var keyFile string
-	var generateCert bool
+	var digSig string
 	flag.StringVar(&addr, "addr", "0.0.0.0:8080", "Address of the server")
 	flag.BoolVar(&isServer, "server", false, "Start in server mode")
 	flag.BoolVar(&isClient, "client", false, "Start in client mode")
 	flag.BoolVar(&useTLS, "tls", false, "Use TLS")
 	flag.BoolVar(&usePQC, "pq_tls", false, "Use PQ-TLS")
-	flag.StringVar(&certFile, "cert", "cert.pem", "Certificate file")
-	flag.StringVar(&keyFile, "key", "key.pem", "Key file")
-	flag.BoolVar(&generateCert, "generate-cert", false, "Generate a self-signed certificate")
+	flag.StringVar(&digSig, "sig", "dilithium3", "Digital Signature to Use")
 	flag.Parse()
 	// show help if no arguments are passed
 	if flag.NFlag() == 0 {
@@ -46,8 +42,10 @@ func main() {
 		tls_type = 0
 	}
 
+	certFile := "./certs/" + digSig + "_CA.crt"
+	keyFile := "./certs/" + digSig + "_CA.key"
 	if isServer {
-		startServer(addr, int8(tls_type), certFile, keyFile, generateCert)
+		startServer(addr, int8(tls_type), certFile, keyFile)
 	} else {
 		startClient(addr, useTLS, certFile)
 	}

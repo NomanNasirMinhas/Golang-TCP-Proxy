@@ -13,7 +13,7 @@ import (
 	"github.com/open-quantum-safe/liboqs-go/oqs"
 )
 
-func startServer(addr string, TLS_Type int8, certFile string, keyFile string, generateCert bool) {
+func startServer(addr string, TLS_Type int8, certFile string, keyFile string) {
 	d := oqs.LiboqsVersion()
 	fmt.Printf("Lib-OQS version: %s\n", d)
 
@@ -23,13 +23,8 @@ func startServer(addr string, TLS_Type int8, certFile string, keyFile string, ge
 		println("Running TLS server")
 		// Check if the certificate and key files exist
 		if _, err := os.Stat(certFile); os.IsNotExist(err) {
-			log.Printf("certificate file %s does not exist.", certFile)
-			if generateCert {
-				log.Printf("generating self-signed certificate %s", certFile)
-				generateCertFunc(strings.Split(addr, ":")[0])
-			} else {
-				log.Fatalf("use -generate-cert to generate a self-signed certificate")
-			}
+			log.Printf("certificate file %s does not exist. Generating", certFile)
+			generateCertFunc(strings.Split(addr, ":")[0])
 		}
 		cert, err := tls.LoadX509KeyPair(certFile, keyFile)
 		if err != nil {
@@ -47,13 +42,7 @@ func startServer(addr string, TLS_Type int8, certFile string, keyFile string, ge
 		println("Running PQ-TLS server")
 		// Check if the certificate and key files exist
 		if _, err := os.Stat(certFile); os.IsNotExist(err) {
-			log.Printf("certificate file %s does not exist.", certFile)
-			if generateCert {
-				log.Printf("generating self-signed certificate %s", certFile)
-				generateCertFunc(strings.Split(addr, ":")[0])
-			} else {
-				log.Fatalf("use -generate-cert to generate a self-signed certificate")
-			}
+			log.Fatalf("certificate file %s does not exist.", certFile)
 		}
 		cert, err := tls.LoadX509KeyPair(certFile, keyFile)
 		if err != nil {
