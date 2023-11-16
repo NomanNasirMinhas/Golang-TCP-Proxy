@@ -44,10 +44,12 @@ func startServer(addr string, TLS_Type int8, certFile string, keyFile string) {
 		if _, err := os.Stat(certFile); os.IsNotExist(err) {
 			log.Fatalf("certificate file %s does not exist.", certFile)
 		}
+		fmt.Println("Loading certificate", certFile, keyFile)
 		cert, err := tls.LoadX509KeyPair(certFile, keyFile)
 		if err != nil {
 			log.Fatal(err)
 		}
+		fmt.Println("Setting up config")
 		config := &tls.Config{Certificates: []tls.Certificate{cert}}
 		log.Printf("listening on port %s\n", addr)
 		ln, err = tls.Listen("tcp", addr, config)
